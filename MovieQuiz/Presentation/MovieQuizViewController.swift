@@ -62,16 +62,12 @@ final class MovieQuizViewController: UIViewController {
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         let currentQuestion = questions[currentQuestionIndex]
-        let givenAnswer: Bool = false
-        
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        showAnswerResult(isCorrect: !currentQuestion.correctAnswer)
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         let currentQuestion = questions[currentQuestionIndex]
-        let givenAnswer: Bool = true
-        
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        showAnswerResult(isCorrect: currentQuestion.correctAnswer)
     }
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
@@ -88,7 +84,6 @@ final class MovieQuizViewController: UIViewController {
         previewImageView.image = step.image
         
         previewImageView.layer.borderWidth = 0
-        //self.previewImageView.layer.borderColor = UIColor.clear.cgColor
    }
     
     private func showAnswerResult(isCorrect: Bool) {
@@ -100,9 +95,9 @@ final class MovieQuizViewController: UIViewController {
         
         toggleButtons(isEnabled: false)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.showNextQuestionOrResult()
-            self.toggleButtons(isEnabled: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            self?.showNextQuestionOrResult()
+            self?.toggleButtons(isEnabled: true)
         }
     }
     
@@ -131,11 +126,13 @@ final class MovieQuizViewController: UIViewController {
             message: result.text,
             preferredStyle: .alert)
         
-        let action = UIAlertAction(title: result.buttonText, style: .default) { _ in
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
+        let quizStart = self.convert(model: self.questions[0])
+        
+        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
+            self?.currentQuestionIndex = 0
+            self?.correctAnswers = 0
             
-            self.show(quiz: self.convert(model: self.questions[self.currentQuestionIndex]))
+            self?.show(quiz: quizStart)
         }
         
         alert.addAction(action)
