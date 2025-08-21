@@ -17,6 +17,7 @@ final class MovieQuizViewController: UIViewController {
     private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactory = QuestionFactory()
     private var currentQuestion: QuizQuestion?
+    private var statisticService: StatisticServiceProtocol = StatisticService()
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -33,6 +34,8 @@ final class MovieQuizViewController: UIViewController {
             let viewModel = convert(model: firstQuestion)
             show(quiz: viewModel)
         }
+        
+        print(NSHomeDirectory())
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
@@ -88,9 +91,11 @@ final class MovieQuizViewController: UIViewController {
                 show(quiz: viewModel)
             }
         } else {
+            statisticService.store(correct: correctAnswers, total: questionsAmount)
+            
             let result = QuizResultViewModel(
-                title: "Раунд окончен!",
-                text: "Ваш результат: \(correctAnswers)/10",
+                title: "Этот раунд окончен!",
+                text: statisticService.messageResultAlert(correct: correctAnswers, total: questionsAmount),
                 buttonText: "Сыграть ещё раз"
             )
             show(quiz: result)
