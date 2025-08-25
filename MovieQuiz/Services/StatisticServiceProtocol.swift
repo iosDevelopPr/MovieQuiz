@@ -13,5 +13,4 @@ protocol StatisticServiceProtocol {
     var bestGame: GameResult { get }
     
     func store(correct count: Int, total amount: Int)
-    func messageResultAlert(correct count: Int, total amount: Int) -> String
 }

@@ -81,14 +81,4 @@ final class StatisticService: StatisticServiceProtocol {
             bestGame = currentGameResult
         }
     }
-    
-    func messageResultAlert(correct count: Int, total amount: Int) -> String {
-        let message =
-            "Ваш результат: \(count)/\(amount)\n" +
-            "Количество сыграннных квизов: \(gamesCount)\n" +
-            "Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))\n" +
-            "Средняя точность: \(String(format: "%.2f", totalAccuracy))"
-        
-        return message
-    }
 }

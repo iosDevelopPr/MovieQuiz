@@ -106,7 +106,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             
             let result = QuizResultViewModel(
                 title: "Этот раунд окончен!",
-                text: statisticService.messageResultAlert(correct: correctAnswers, total: questionsAmount),
+                text: messageResultAlert(),
                 buttonText: "Сыграть ещё раз"
             )
             show(quiz: result)
@@ -119,22 +119,26 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func show(quiz result: QuizResultViewModel) {
-        let alert = UIAlertController(
-            title: result.title,
-            message: result.text,
-            preferredStyle: .alert)
-        
-        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
+        let model = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText) { [weak self] in
             guard let self = self else { return }
             
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
             
-            questionFactory?.requestNextQuestion()
+            self.questionFactory?.requestNextQuestion()
         }
+        alertPresenter.show(in: self, model: model)
+    }
+    
+    private func messageResultAlert() -> String {
+        let bestGame = statisticService.bestGame
+        let message =
+            "Ваш результат: \(correctAnswers)/\(questionsAmount)\n" +
+            "Количество сыграннных квизов: \(statisticService.gamesCount)\n" +
+            "Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))\n" +
+            "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))"
         
-        alert.addAction(action)
-        present(alert, animated: true, completion: nil)
+        return message
     }
 }
 
