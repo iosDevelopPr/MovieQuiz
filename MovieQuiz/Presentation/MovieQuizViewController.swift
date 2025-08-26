@@ -86,13 +86,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         previewImageView.layer.borderWidth = 8
         previewImageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         
-        toggleButtons(isEnabled: false)
+        toggleButtons(false)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             self.showNextQuestionOrResult()
             
-            self.toggleButtons(isEnabled: true)
+            self.toggleButtons(true)
         }
     }
     
@@ -113,7 +113,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
-    private func toggleButtons(isEnabled: Bool) {
+    private func toggleButtons(_ isEnabled: Bool) {
         yesButton.isEnabled = isEnabled
         noButton.isEnabled = isEnabled
     }
@@ -136,7 +136,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             "Ваш результат: \(correctAnswers)/\(questionsAmount)\n" +
             "Количество сыграннных квизов: \(statisticService.gamesCount)\n" +
             "Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))\n" +
-            "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))"
+            "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy * 100))%"
         
         return message
     }
