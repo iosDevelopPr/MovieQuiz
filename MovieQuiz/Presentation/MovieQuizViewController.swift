@@ -136,7 +136,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             "Ваш результат: \(correctAnswers)/\(questionsAmount)\n" +
             "Количество сыграннных квизов: \(statisticService.gamesCount)\n" +
             "Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))\n" +
-            "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy * 100))%"
+            "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
         
         return message
     }
