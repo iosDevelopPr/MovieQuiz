@@ -22,7 +22,7 @@ final class StatisticService: StatisticServiceProtocol {
     // MARK: - Property protocol implementation
     
     var totalAccuracy: Double {
-        totalQuestionsAsked > 0 ? Double(totalCorrectAnswers) / Double(totalQuestionsAsked) : 0
+        totalQuestionsAsked > 0 ? Double(totalCorrectAnswers) / Double(totalQuestionsAsked) * 100 : 0
     }
     
     var gamesCount: Int {
