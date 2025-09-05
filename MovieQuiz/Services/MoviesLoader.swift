@@ -15,9 +15,21 @@ struct MoviesLoader: MoviesLoading {
     // MARK: - NetworkClient
     private let networkClient = NetworkClient()
     
+    // MARK: - NetworkError200
+    enum NetworkError200: Error {
+        case codeError(textError: String)
+        
+        var localizedDescription: String {
+            switch self {
+            case .codeError(textError: let textError):
+                return textError
+            }
+        }
+    }
+    
     // MARK: - URL
     private var mostPopularMoviesURL: URL {
-        guard let url = URL(string: "https://tv-api.com/en/API/Top250Movies/k_zcuw1ytf") else {
+        guard let url = URL(string: "https://tv-api.com/en/API/Top250Movies/k_zcuw1ytf1") else {
             preconditionFailure("Unable to construct mostPopularMoviesURL")
         }
         return url
@@ -29,7 +41,12 @@ struct MoviesLoader: MoviesLoading {
             case .success(let data):
                 do {
                     let movies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
-                    handler(.success(movies))
+                    if movies.items.count == 0 {
+                        let textError = movies.errorMessage != "" ? "Сервис не вернул данные" : movies.errorMessage
+                        handler(.failure(NetworkError200.codeError(textError: textError)))
+                    } else {
+                        handler(.success(movies))
+                    }
                 } catch {
                     handler(.failure(error))
                 }
