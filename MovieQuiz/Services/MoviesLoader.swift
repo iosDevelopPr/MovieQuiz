@@ -42,7 +42,7 @@ struct MoviesLoader: MoviesLoading {
                 do {
                     let movies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
                     if movies.items.count == 0 {
-                        let textError = movies.errorMessage != "" ? "Сервис не вернул данные" : movies.errorMessage
+                        let textError = movies.errorMessage == "" ? "Сервис не вернул данные" : movies.errorMessage
                         handler(.failure(NetworkError200.codeError(textError: textError)))
                     } else {
                         handler(.success(movies))
