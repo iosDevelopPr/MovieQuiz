@@ -59,7 +59,7 @@ final class MovieQuizViewController: UIViewController {
         presenter = MovieQuizPresenter(viewController: self)
     }
     
-    private func enabledButton(_ isEnabled: Bool) {
+    func enabledButton(_ isEnabled: Bool) {
         yesButton.isEnabled = isEnabled
         noButton.isEnabled = isEnabled
     }
@@ -85,24 +85,10 @@ final class MovieQuizViewController: UIViewController {
         presenter.switchToNextQuestion()
     }
     
-    func showAnswerResult(isCorrect: Bool) {
-        if isCorrect {
-            presenter.switchToCorrectAnswers()
-        }
-        
+    func highlightImageBorder(isCorrect: Bool) {
         previewImageView.layer.masksToBounds = true
         previewImageView.layer.borderWidth = 8
         previewImageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        
-        enabledButton(false)
-        stopActivityIndicator()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
-            
-            self.startActivityIndicator()
-            self.presenter.showNextQuestionOrResult()
-        }
     }
     
     func showAlert(quiz result: QuizResultViewModel) {
@@ -117,6 +103,7 @@ final class MovieQuizViewController: UIViewController {
             self.startActivityIndicator()
             self.presenter.didLoadDataFromServer()
         }
+        
         alertPresenter.show(in: self, model: model)
     }
 

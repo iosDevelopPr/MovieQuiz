@@ -45,7 +45,12 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     private func didAnswer(isCorrect: Bool) {
         guard let currentQuestion = currentQuestion else { return }
-        self.viewController?.showAnswerResult(isCorrect: isCorrect == currentQuestion.correctAnswer)
+        
+        if isCorrect {
+            correctAnswers += 1
+        }
+        
+        showAnswerResult(isCorrect: isCorrect == currentQuestion.correctAnswer)
     }
 
     func isLastQuestion() -> Bool {
@@ -59,10 +64,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     func switchToNextQuestion() {
         currentQuestionIndex += 1
-    }
-    
-    func switchToCorrectAnswers() {
-        correctAnswers += 1
     }
 
     func didReceiveNextQuestion(question: QuizQuestion?) {
@@ -112,6 +113,20 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
+    func showAnswerResult(isCorrect: Bool) {
+        self.viewController?.highlightImageBorder(isCorrect: isCorrect)
+        
+        self.viewController?.enabledButton(false)
+        self.viewController?.stopActivityIndicator()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            guard let self = self else { return }
+            
+            self.viewController?.startActivityIndicator()
+            self.showNextQuestionOrResult()
+        }
+    }
+
     private func messageResultAlert() -> String {
         let bestGame = statisticService.bestGame
         let message =
