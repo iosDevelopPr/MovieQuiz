@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     
     // MARK: - Private properties
 
@@ -41,7 +41,7 @@ final class MovieQuizViewController: UIViewController {
     private func setupUI() {
         activityIndicator.hidesWhenStopped = true
         startActivityIndicator()
-        enabledButton(false)
+        enabledButton(isEnabled: false)
     }
     
     private func setupFonts() {
@@ -59,7 +59,7 @@ final class MovieQuizViewController: UIViewController {
         presenter = MovieQuizPresenter(viewController: self)
     }
     
-    func enabledButton(_ isEnabled: Bool) {
+    func enabledButton(isEnabled: Bool) {
         yesButton.isEnabled = isEnabled
         noButton.isEnabled = isEnabled
     }
@@ -80,7 +80,7 @@ final class MovieQuizViewController: UIViewController {
         previewImageView.layer.borderWidth = 0
         
         stopActivityIndicator()
-        enabledButton(true)
+        enabledButton(isEnabled: true)
 
         presenter.switchToNextQuestion()
     }

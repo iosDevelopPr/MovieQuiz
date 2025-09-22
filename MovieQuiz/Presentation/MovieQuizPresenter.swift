@@ -9,16 +9,22 @@ import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     
+    private let responseDisplayDuration = 1.5
+    
+    private let unableToLoadData = "Невозможно загрузить данные"
+    private let unableToLoadImage = "Невозможно загрузить изображение"
+    private let internalServerError = "Сервер не смог обработать запрос"
+
     private var currentQuestionIndex: Int = 1
     private var correctAnswers: Int = 0
     private let questionsAmount: Int = 10
     
     private var currentQuestion: QuizQuestion?
-    private weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewControllerProtocol?
     private var statisticService: StatisticServiceProtocol!
     private var questionFactory: QuestionFactoryProtocol?
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         
         self.statisticService = StatisticService()
@@ -44,7 +50,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     private func didAnswer(isCorrect: Bool) {
-        guard let currentQuestion = currentQuestion else { return }
+        guard let currentQuestion else { return }
         
         if isCorrect {
             correctAnswers += 1
@@ -88,17 +94,17 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     func didFailToLoadData(with error: any Error) {
         switch error {
         case NetworkError.dataLoadingError:
-            self.viewController?.showNetworkError(message: "Невозможно загрузить данные")
+            self.viewController?.showNetworkError(message: unableToLoadData)
         case NetworkError.imageLoadingError:
-            self.viewController?.showErrorToLoadData(message: "Невозможно загрузить изображение")
+            self.viewController?.showErrorToLoadData(message: unableToLoadImage)
         case NetworkError.codeError:
-            self.viewController?.showErrorToLoadData(message: "Сервер не смог обработать запрос")
+            self.viewController?.showErrorToLoadData(message: internalServerError)
         default:
             self.viewController?.showNetworkError(message: error.localizedDescription)
         }
     }
 
-   func showNextQuestionOrResult() {
+    func showNextQuestionOrResult() {
         if isLastQuestion() {
             statisticService.store(correct: correctAnswers, total: questionsAmount)
             
@@ -116,10 +122,10 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     func showAnswerResult(isCorrect: Bool) {
         self.viewController?.highlightImageBorder(isCorrect: isCorrect)
         
-        self.viewController?.enabledButton(false)
+        self.viewController?.enabledButton(isEnabled: false)
         self.viewController?.stopActivityIndicator()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + responseDisplayDuration) { [weak self] in
             guard let self = self else { return }
             
             self.viewController?.startActivityIndicator()
@@ -130,7 +136,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private func messageResultAlert() -> String {
         let bestGame = statisticService.bestGame
         let message =
-        "Ваш результат: \(correctAnswers)/\(questionsAmount)\n" +
+            "Ваш результат: \(correctAnswers)/\(questionsAmount)\n" +
             "Количество сыграннных квизов: \(statisticService.gamesCount)\n" +
             "Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))\n" +
             "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
